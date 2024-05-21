@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(tags = SwaggerTags.EXAMPLE)
 @RestController("exampleController.v1")
-@RequestMapping("/v1/example")
+@RequestMapping("/v1/example/")
 public class ExampleController extends BaseController {
 
     @Autowired

@@ -10,7 +10,6 @@ import io.choerodon.resource.annoation.EnableChoerodonResourceServer;
 @SpringBootApplication
 
 public class HzeroFinalProjectApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(HzeroFinalProjectApplication.class, args);
     }

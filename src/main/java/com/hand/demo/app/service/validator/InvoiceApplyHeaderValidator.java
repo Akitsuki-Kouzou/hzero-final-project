@@ -3,6 +3,7 @@ package com.hand.demo.app.service.validator;
 import com.alibaba.fastjson.JSON;
 import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import com.hand.demo.domain.repository.InvoiceApplyHeaderRepository;
+import com.hand.demo.infra.constant.Constants;
 import org.hzero.boot.imported.app.service.BatchValidatorHandler;
 import org.hzero.boot.imported.infra.validator.annotation.ImportValidator;
 import org.hzero.boot.imported.infra.validator.annotation.ImportValidators;
@@ -44,14 +45,15 @@ public class InvoiceApplyHeaderValidator extends BatchValidatorHandler {
 
 //            Check Create Header Data
 //                Validate Apply Status, Invoice Color, and Invoice Type
+
             if(!applyStatusList.contains(header.getApplyStatus())){
-                addErrorMsg(i, "Apply Status "+ header.getApplyStatus()+" is incorrect");
+                addErrorMsg(i, "Apply Status "+ header.getApplyStatus()+ Constants.ERR_MESS);
                 flag = false;
             }else if (!invoiceColorList.contains(header.getInvoiceColor())){
-                addErrorMsg(i, "Invoice Color "+header.getInvoiceColor()+" is incorrect");
+                addErrorMsg(i, "Invoice Color "+header.getInvoiceColor()+Constants.ERR_MESS);
                 flag = false;
             }else if (!invoiceTypeList.contains(header.getInvoiceType())){
-                addErrorMsg(i, "Invoice Type "+header.getInvoiceType()+" is incorrect");
+                addErrorMsg(i, "Invoice Type "+header.getInvoiceType()+Constants.ERR_MESS);
                 flag = false;
             }
         }

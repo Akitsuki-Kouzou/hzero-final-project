@@ -2,11 +2,9 @@ package com.hand.demo.app.service.impl;
 
 import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import com.hand.demo.domain.repository.InvoiceApplyHeaderRepository;
-import com.hand.demo.infra.constant.Constants;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hzero.core.redis.RedisHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hand.demo.app.service.InvoiceApplyLineService;
 import org.springframework.stereotype.Service;

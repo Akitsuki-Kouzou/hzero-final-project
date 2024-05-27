@@ -64,8 +64,8 @@ public class InvoiceApplyHeaderServiceImpl implements InvoiceApplyHeaderService 
         invoiceApplyHeaderRepository.batchUpdateByPrimaryKeySelective(updateList);
 
 //      Update Data in Redis
-        if(updateList.size()>0){
-            updateList.forEach(item -> updateRedis(item));
+        if(!updateList.isEmpty()){
+            updateList.forEach(this::updateRedis);
         }
     }
 

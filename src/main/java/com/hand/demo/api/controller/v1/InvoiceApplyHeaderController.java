@@ -1,6 +1,5 @@
 package com.hand.demo.api.controller.v1;
 
-import com.hand.demo.infra.constant.Constants;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;

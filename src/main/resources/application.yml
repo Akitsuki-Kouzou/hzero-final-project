@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hzero-final-project
+    name: 46321-hzero-final-project
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://172.22.4.113:3306/hand_todo?useUnicode=true&characterEncoding=utf-8&useSSL=false}
     username: ${SPRING_DATASOURCE_USERNAME:todo}
@@ -90,3 +90,4 @@ logging:
     org.apache.ibatis: debug
     io.choerodon: debug
     org.hzero: debug
+    com.hand.demo: debug

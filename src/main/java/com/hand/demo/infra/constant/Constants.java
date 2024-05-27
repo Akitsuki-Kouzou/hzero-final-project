@@ -7,5 +7,5 @@ public class Constants {
 
     private Constants() {}
 
-
+    public static final String DETAIL_REDIS_KEY = "Detail-46321:";
 }

@@ -43,9 +43,9 @@ public class InvoiceApplyHeaderRepositoryImpl extends BaseRepositoryImpl<Invoice
 
     @Override
     public InvoiceApplyHeader selectByPrimary(Long applyHeaderId) {
-        String cache = redisHelper.strGet(Constants.DETAIL_REDIS_KEY+applyHeaderId);
+        String cache = redisHelper.strGet(Constants.DETAIL_REDIS_KEY + applyHeaderId);
         List<InvoiceApplyHeader> invoiceApplyHeaders = null;
-        if( cache==null ){
+        if (cache == null) {
             InvoiceApplyHeader invoiceApplyHeader = new InvoiceApplyHeader();
             invoiceApplyHeader.setApplyHeaderId(applyHeaderId);
             invoiceApplyHeaders = invoiceApplyHeaderMapper.selectHead(invoiceApplyHeader);
@@ -55,8 +55,9 @@ public class InvoiceApplyHeaderRepositoryImpl extends BaseRepositoryImpl<Invoice
             InvoiceApplyLine queryParam = new InvoiceApplyLine();
             queryParam.setApplyHeaderId(applyHeaderId);
             invoiceApplyHeaders.get(0).setLineList(invoiceApplyLineRepository.select(queryParam));
-            redisHelper.strSet(Constants.DETAIL_REDIS_KEY+invoiceApplyHeaders.get(0).getApplyHeaderId(), JSON.toJSONString(invoiceApplyHeaders.get(0)), 5, TimeUnit.MINUTES);
-        }else {
+            redisHelper.strSet(Constants.DETAIL_REDIS_KEY + invoiceApplyHeaders.get(0).getApplyHeaderId(),
+                    JSON.toJSONString(invoiceApplyHeaders.get(0)), 5, TimeUnit.MINUTES);
+        } else {
             return JSON.parseObject(cache, InvoiceApplyHeader.class);
         }
         return invoiceApplyHeaders.get(0);
@@ -64,28 +65,29 @@ public class InvoiceApplyHeaderRepositoryImpl extends BaseRepositoryImpl<Invoice
 
     @Override
     public void updateRedis(Long applyHeaderId) {
-        String cache = redisHelper.strGet(Constants.DETAIL_REDIS_KEY + applyHeaderId);
         List<InvoiceApplyHeader> invoiceApplyHeaders = null;
 //        If cache Found Update Redis
-        if (cache != null) {
-            InvoiceApplyHeader findHead = new InvoiceApplyHeader();
-            findHead.setApplyHeaderId(applyHeaderId);
-            invoiceApplyHeaders = invoiceApplyHeaderMapper.selectHead(findHead);
-            if (invoiceApplyHeaders.isEmpty()) {
-                return;
-            }
-            InvoiceApplyLine queryParam = new InvoiceApplyLine();
-            queryParam.setApplyHeaderId(applyHeaderId);
-            invoiceApplyHeaders.get(0).setLineList(invoiceApplyLineRepository.select(queryParam));
-            redisHelper.strSet(Constants.DETAIL_REDIS_KEY + invoiceApplyHeaders.get(0).getApplyHeaderId(), JSON.toJSONString(invoiceApplyHeaders.get(0)), 5, TimeUnit.MINUTES);
+        InvoiceApplyHeader findHead = new InvoiceApplyHeader();
+        findHead.setApplyHeaderId(applyHeaderId);
+        invoiceApplyHeaders = invoiceApplyHeaderMapper.selectHead(findHead);
+        if (invoiceApplyHeaders.isEmpty()) {
+            return;
         }
+        InvoiceApplyLine queryParam = new InvoiceApplyLine();
+        queryParam.setApplyHeaderId(applyHeaderId);
+        invoiceApplyHeaders.get(0).setLineList(invoiceApplyLineRepository.select(queryParam));
+        redisHelper.strSet(Constants.DETAIL_REDIS_KEY + invoiceApplyHeaders.get(0).getApplyHeaderId(),
+                JSON.toJSONString(invoiceApplyHeaders.get(0)), 5, TimeUnit.MINUTES);
     }
 
     @Override
-    public List<InvoiceApplyHeader> redisMessagePush() {
-        return invoiceApplyHeaderMapper.redisQueuePush();
+    public List<InvoiceApplyHeader> selectStatusFailed() {
+        return invoiceApplyHeaderMapper.selectStatusFailed();
     }
 
-
+    @Override
+    public void deleteRedis(Long applyHeaderId) {
+        redisHelper.delKey(Constants.DETAIL_REDIS_KEY + applyHeaderId);
+    }
 }
 

@@ -20,6 +20,6 @@ public interface InvoiceApplyHeaderMapper extends BaseMapper<InvoiceApplyHeader>
      */
     List<InvoiceApplyHeader> selectHead(InvoiceApplyHeader invoiceApplyHeader);
 
-    List<InvoiceApplyHeader> redisQueuePush();
+    List<InvoiceApplyHeader> selectStatusFailed();
 }
 

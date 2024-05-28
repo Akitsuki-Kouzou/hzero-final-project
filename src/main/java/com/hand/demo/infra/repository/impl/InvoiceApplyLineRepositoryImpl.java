@@ -32,12 +32,6 @@ public class InvoiceApplyLineRepositoryImpl extends BaseRepositoryImpl<InvoiceAp
     @Autowired
     private InvoiceApplyHeaderRepository invoiceApplyHeaderRepository;
 
-    @Autowired
-    private InvoiceApplyLineRepository invoiceApplyLineRepository;
-
-    @Autowired
-    private RedisHelper redisHelper;
-
     @Override
     public List<InvoiceApplyLine> selectList(InvoiceApplyLine invoiceApplyLine) {
         return invoiceApplyLineMapper.selectLine(invoiceApplyLine);
@@ -48,7 +42,7 @@ public class InvoiceApplyLineRepositoryImpl extends BaseRepositoryImpl<InvoiceAp
         InvoiceApplyLine invoiceApplyLine = new InvoiceApplyLine();
         invoiceApplyLine.setApplyLineId(applyLineId);
         List<InvoiceApplyLine> invoiceApplyLines = invoiceApplyLineMapper.selectLine(invoiceApplyLine);
-        if (invoiceApplyLines.size() == 0) {
+        if (invoiceApplyLines.isEmpty()) {
             return null;
         }
         return invoiceApplyLines.get(0);
@@ -56,21 +50,7 @@ public class InvoiceApplyLineRepositoryImpl extends BaseRepositoryImpl<InvoiceAp
 
     @Override
     public void updateRedis(Long applyHeaderId) {
-        String cache = redisHelper.strGet(Constants.DETAIL_REDIS_KEY + applyHeaderId);
-        List<InvoiceApplyHeader> invoiceApplyHeaders = null;
-//        If cache Found Update Redis
-        if (cache != null) {
-            InvoiceApplyHeader findHead = new InvoiceApplyHeader();
-            findHead.setApplyHeaderId(applyHeaderId);
-            invoiceApplyHeaders = invoiceApplyHeaderRepository.select(findHead);
-            if (invoiceApplyHeaders.isEmpty()) {
-                return;
-            }
-            InvoiceApplyLine queryParam = new InvoiceApplyLine();
-            queryParam.setApplyHeaderId(applyHeaderId);
-            invoiceApplyHeaders.get(0).setLineList(invoiceApplyLineRepository.select(queryParam));
-            redisHelper.strSet(Constants.DETAIL_REDIS_KEY + invoiceApplyHeaders.get(0).getApplyHeaderId(), JSON.toJSONString(invoiceApplyHeaders.get(0)), 5, TimeUnit.MINUTES);
-        }
+        invoiceApplyHeaderRepository.updateRedis(applyHeaderId);
     }
 
     public List<InvoiceApplyLine> selectExport(InvoiceApplyLine invoiceApplyLine) {

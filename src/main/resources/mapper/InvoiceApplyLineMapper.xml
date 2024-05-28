@@ -91,12 +91,53 @@
     </select>
 
     <select id="selectExport" resultType = "com.hand.demo.domain.entity.InvoiceApplyLine">
-        SELECT line.*, head.apply_header_number
-        FROM `46321_invoice_apply_line` line
-        LEFT JOIN `46321_invoice_apply_header` head ON line.apply_header_id = head.apply_header_id
+        select
+        <include refid = "BaseSql"/>, head.apply_header_number
+        from 46321_invoice_apply_line 4ial
+        LEFT JOIN `46321_invoice_apply_header` head ON 4ial.apply_header_id = head.apply_header_id
         <where>
+            <if test="applyLineId !=null">
+                and 4ial.apply_line_id = #{applyLineId,jdbcType = INTEGER}
+            </if>
             <if test="tenantId !=null">
-                and line.tenant_id = #{tenantId,jdbcType = INTEGER}
+                and 4ial.tenant_id = #{tenantId,jdbcType = INTEGER}
+            </if>
+            <if test="applyHeaderId !=null">
+                and 4ial.apply_header_id = #{applyHeaderId,jdbcType = INTEGER}
+            </if>
+            <if test="invoiceName !=null and '' != invoiceName">
+                <bind name="invoiceNameLike" value="'%' + invoiceName + '%'"/>
+                and 4ial.invoice_name like #{invoiceNameLike}
+            </if>
+            <if test="contentName !=null and '' != contentName">
+                <bind name="contentNameLike" value="'%' + contentName + '%'"/>
+                and 4ial.content_name like #{contentNameLike}
+            </if>
+            <if test="taxClassificationNumber !=null and '' != taxClassificationNumber">
+                <bind name="taxClassificationNumberLike" value="'%' + taxClassificationNumber + '%'"/>
+                and 4ial.tax_classification_number like #{taxClassificationNumberLike}
+            </if>
+            <if test="unitPrice !=null">
+                and 4ial.unit_price = #{unitPrice,jdbcType = OTHER}
+            </if>
+            <if test="quantity !=null">
+                and 4ial.quantity = #{quantity,jdbcType = OTHER}
+            </if>
+            <if test="excludeTaxAmount !=null">
+                and 4ial.exclude_tax_amount = #{excludeTaxAmount,jdbcType = OTHER}
+            </if>
+            <if test="taxRate !=null">
+                and 4ial.tax_rate = #{taxRate,jdbcType = OTHER}
+            </if>
+            <if test="taxAmount !=null">
+                and 4ial.tax_amount = #{taxAmount,jdbcType = OTHER}
+            </if>
+            <if test="totalAmount !=null">
+                and 4ial.total_amount = #{totalAmount,jdbcType = OTHER}
+            </if>
+            <if test="remark !=null and '' != remark">
+                <bind name="remarkLike" value="'%' + remark + '%'"/>
+                and 4ial.remark like #{remarkLike}
             </if>
         </where>
     </select>

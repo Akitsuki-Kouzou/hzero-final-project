@@ -1,12 +1,16 @@
 package com.hand.demo.api.controller.v1;
 
+import com.alibaba.fastjson.JSON;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
+import org.hzero.boot.message.MessageClient;
+import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.core.base.BaseController;
@@ -23,7 +27,10 @@ import com.hand.demo.domain.repository.InvoiceApplyHeaderRepository;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * (InvoiceApplyHeader)表控制层
@@ -41,6 +48,9 @@ public class InvoiceApplyHeaderController extends BaseController {
 
     @Autowired
     private InvoiceApplyHeaderService invoiceApplyHeaderService;
+
+    @Autowired
+    private MessageClient messageClient;
 
     @ApiOperation(value = "列表")
     @Permission(level = ResourceLevel.ORGANIZATION, permissionLogin = true)
@@ -79,9 +89,9 @@ public class InvoiceApplyHeaderController extends BaseController {
     public ResponseEntity<InvoiceApplyHeader> remove(@RequestBody List<InvoiceApplyHeader> invoiceApplyHeaders) {
         SecurityTokenHelper.validToken(invoiceApplyHeaders);
         invoiceApplyHeaders.forEach(item -> item.setDelFlag(BaseConstants.Flag.YES));
-        invoiceApplyHeaderRepository.batchUpdateByPrimaryKeySelective(invoiceApplyHeaders);
-//        Update in Redis
-        invoiceApplyHeaders.forEach(item -> invoiceApplyHeaderRepository.updateRedis(item.getApplyHeaderId()));
+        invoiceApplyHeaderRepository.batchUpdateOptional(invoiceApplyHeaders, InvoiceApplyHeader.FIELD_DEL_FLAG);
+        //  delete from Redis
+        invoiceApplyHeaders.forEach(item -> invoiceApplyHeaderRepository.deleteRedis(item.getApplyHeaderId()));
         return Results.success();
     }
 
@@ -93,6 +103,22 @@ public class InvoiceApplyHeaderController extends BaseController {
                                                            ExportParam exportParam, InvoiceApplyHeader invoiceApplyHeader, HttpServletResponse response){
         invoiceApplyHeader.setTenantId(organizationId);
         return Results.success( invoiceApplyHeaderRepository.selectList(invoiceApplyHeader));
+    }
+
+    @ApiOperation(value = "列表")
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionLogin = true)
+    @GetMapping("/send-email")
+    public ResponseEntity<List<InvoiceApplyHeader>> send_email() {
+        Long tenantId = DetailsHelper.getUserDetails().getTenantId();
+        List<InvoiceApplyHeader> task = invoiceApplyHeaderRepository.selectStatusFailed();
+        String jsonStr = JSON.toJSONString(task);
+        Receiver rcv = new Receiver();
+        Map<String, String> args = new HashMap<>();
+        args.put("employeeId", "46321");
+        args.put("content", jsonStr);
+        rcv.setEmail("ariel.peaceo@hand-global.com");
+        messageClient.sendEmail(tenantId, "AKI.EMAIL", "46321-TEMPLATE", Collections.singletonList(rcv), args);
+        return Results.success(task);
     }
 }
 

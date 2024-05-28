@@ -97,6 +97,9 @@
             <if test="taxAmount !=null">
                 and 4iah.tax_amount = #{taxAmount,jdbcType = OTHER}
             </if>
+            <if test="delFlag ==null">
+                and 4iah.del_flag = 0
+            </if>
             <if test="delFlag !=null">
                 and 4iah.del_flag = #{delFlag,jdbcType = INTEGER}
             </if>
@@ -104,10 +107,18 @@
                 <bind name="remarkLike" value="'%' + remark + '%'"/>
                 and 4iah.remark like #{remarkLike}
             </if>
+            <if test="null != lineIdList">
+                and 4iah.header_id in (select invoice_hader_id from 46321_invoice_apply_line
+                where invoice_line_id in
+                <foreach collection="lineIdList" item="lineId" separator=",">
+                    #{lineId}
+                </foreach>
+                )
+            </if>
         </where>
     </select>
 
-    <select id="redisQueuePush" resultType="com.hand.demo.domain.entity.InvoiceApplyHeader">
+    <select id="selectStatusFailed" resultType="com.hand.demo.domain.entity.InvoiceApplyHeader">
         SELECT
         <include refid = "BaseSql"/>
         from `46321_invoice_apply_header` 4iah

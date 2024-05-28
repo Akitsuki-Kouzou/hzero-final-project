@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import com.hand.demo.domain.repository.InvoiceApplyHeaderRepository;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,36 +39,29 @@ public class InvoiceApplyHeaderServiceImpl implements InvoiceApplyHeaderService 
         List<String> applyStatusList = Arrays.asList("D", "F", "S", "C");
         List<String> invoiceColorList = Arrays.asList("R", "B");
         List<String> invoiceTypeList = Arrays.asList("P", "E");
-        List<InvoiceApplyHeader> insertList = invoiceApplyHeaders.stream().filter(line -> line.getApplyHeaderId() == null)
+        invoiceApplyHeaders.forEach(InvoiceApplyHeader::initAmount);
+        invoiceApplyHeaders = invoiceApplyHeaders.stream()
                 .filter(line -> applyStatusList.contains(line.getApplyStatus()))
                 .filter(line -> invoiceColorList.contains(line.getInvoiceColor()))
                 .filter(line -> invoiceTypeList.contains(line.getInvoiceType()))
+                .collect(Collectors.toList());
+        List<InvoiceApplyHeader> insertList = invoiceApplyHeaders.stream().filter(line -> line.getApplyHeaderId() == null)
                 .collect(Collectors.toList());
         List<InvoiceApplyHeader> updateList = invoiceApplyHeaders.stream().filter(line -> line.getApplyHeaderId() != null)
-                .filter(line -> applyStatusList.contains(line.getApplyStatus()))
-                .filter(line -> invoiceColorList.contains(line.getInvoiceColor()))
-                .filter(line -> invoiceTypeList.contains(line.getInvoiceType()))
                 .collect(Collectors.toList());
-//        Generate Code Rule Builder
+        //        Generate Code Rule Builder
         insertList.forEach(item -> item.setApplyHeaderNumber(codeRuleBuilder.generateCode("AHN-CODE-46321", new HashMap<>())));
-//        Initialize Money for Insert
-        insertList.forEach(item ->
-            {
-                item.setTotalAmount(new BigDecimal(0));
-                item.setExcludeTaxAmount(new BigDecimal(0));
-                item.setTaxAmount(new BigDecimal(0));
-            });
 
         invoiceApplyHeaderRepository.batchInsertSelective(insertList);
         invoiceApplyHeaderRepository.batchUpdateByPrimaryKeySelective(updateList);
 
 //      Update Data in Redis
-        if(!updateList.isEmpty()){
+        if (!updateList.isEmpty()) {
             updateList.forEach(this::updateRedis);
         }
     }
 
-    public void updateRedis(InvoiceApplyHeader invoiceApplyHeader){
+    public void updateRedis(InvoiceApplyHeader invoiceApplyHeader) {
         invoiceApplyHeaderRepository.updateRedis(invoiceApplyHeader.getApplyHeaderId());
     }
 }

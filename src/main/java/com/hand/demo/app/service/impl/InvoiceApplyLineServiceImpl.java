@@ -12,10 +12,7 @@ import com.hand.demo.domain.entity.InvoiceApplyLine;
 import com.hand.demo.domain.repository.InvoiceApplyLineRepository;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,93 +36,40 @@ public class InvoiceApplyLineServiceImpl implements InvoiceApplyLineService {
 
     @Override
     public void saveData(List<InvoiceApplyLine> invoiceApplyLines) {
-        List<InvoiceApplyLine> insertList = invoiceApplyLines.stream().filter(line -> line.getApplyLineId() == null)
+        invoiceApplyLines = invoiceApplyLines.stream()
                 .filter(this::validateDataExistAndNotDeleted)
+                .peek(InvoiceApplyLine::calculateAmount)
+                .collect(Collectors.toList());
+
+        List<InvoiceApplyLine> insertList = invoiceApplyLines.stream().filter(line -> line.getApplyLineId() == null)
                 .collect(Collectors.toList());
 
         List<InvoiceApplyLine> updateList = invoiceApplyLines.stream().filter(line -> line.getApplyLineId() != null)
-                .filter(this::validateDataExistAndNotDeleted)
                 .collect(Collectors.toList());
 
-//        Set Total Amount, Tax Amount, Exclude Tax Amount
-        insertList.forEach(
-                item -> {
-                    item.setTotalAmount(item.getUnitPrice().multiply(item.getQuantity()));
-                    item.setTaxAmount(item.getTotalAmount().multiply(item.getTaxRate()));
-                    item.setExcludeTaxAmount(item.getTotalAmount().subtract(item.getTaxAmount()));
-                }
-        );
-
-        updateList.forEach(
-                item -> {
-                    item.setTotalAmount(item.getUnitPrice().multiply(item.getQuantity()));
-                    item.setTaxAmount(item.getTotalAmount().multiply(item.getTaxRate()));
-                    item.setExcludeTaxAmount(item.getTotalAmount().subtract(item.getTaxAmount()));
-                }
-        );
 
         invoiceApplyLineRepository.batchInsertSelective(insertList);
         invoiceApplyLineRepository.batchUpdateByPrimaryKeySelective(updateList);
 
-        List<Long> headerIdListSave = insertList.stream().map(x -> x.getApplyHeaderId()).distinct().collect(Collectors.toList());
-        List<Long> headerIdListUpdate = updateList.stream().map(x -> x.getApplyHeaderId()).distinct().collect(Collectors.toList());
+        Set<Long> headerIdSet = invoiceApplyLines.stream().map(InvoiceApplyLine::getApplyHeaderId)
+                .collect(Collectors.toSet());
 
-//        Update Head Amount
-        headerIdListSave.forEach(
-                item -> {
-                    addToHead(item);
-                    updateRedis(item);
-                }
-        );
-        headerIdListUpdate.forEach(
-                item -> {
-                    addToHead(item);
-                    updateRedis(item);
-                }
-        );
+        headerIdSet.forEach(x -> {
+            calculateHeaderAmount(x);
+            updateRedis(x);
+        });
 
     }
 
     @Override
-    public List<InvoiceApplyHeader> deleteData(List<InvoiceApplyLine> invoiceApplyLines) {
-//        Input Recalculated HEADER
-        List<InvoiceApplyLine> lineList = new ArrayList<>();
-        invoiceApplyLines.forEach(item -> lineList.add(invoiceApplyLineRepository.selectByPrimary(item.getApplyLineId())));
-        Map<Long, InvoiceApplyHeader> headerMap = new HashMap<>();
-//        Get Sum of Header data needs to be substract
-        lineList.forEach(
-                line -> {
-                    if(headerMap.containsKey(line.getApplyHeaderId())){
-                        InvoiceApplyHeader getData = headerMap.get(line.getApplyHeaderId());
-                        getData.setTotalAmount(getData.getTotalAmount().add(line.getTotalAmount()));
-                        getData.setExcludeTaxAmount(getData.getExcludeTaxAmount().add(line.getExcludeTaxAmount()));
-                        getData.setTaxAmount(getData.getTaxAmount().add(line.getTaxAmount()));
-                        headerMap.put(line.getApplyHeaderId(),getData);
-                    }else{
-                        InvoiceApplyHeader data = new InvoiceApplyHeader();
-                        data.setTotalAmount(line.getTotalAmount());
-                        data.setExcludeTaxAmount(line.getExcludeTaxAmount());
-                        data.setTaxAmount(line.getTaxAmount());
-                        headerMap.put(line.getApplyHeaderId(), data);
-                    }
-                }
-        );
-
-//        Substract the data
-        List<InvoiceApplyHeader> listHeaderChanged = new ArrayList<>();
-        headerMap.forEach(
-                (key, values) -> {
-                    InvoiceApplyHeader getHeader = invoiceApplyHeaderRepository.selectByPrimary(key);
-                    getHeader.setTotalAmount(getHeader.getTotalAmount().subtract(values.getTotalAmount()));
-                    getHeader.setExcludeTaxAmount(getHeader.getExcludeTaxAmount().subtract(values.getExcludeTaxAmount()));
-                    getHeader.setTaxAmount(getHeader.getTaxAmount().subtract(values.getTaxAmount()));
-                    listHeaderChanged.add(getHeader);
-                }
-        );
-
-        invoiceApplyHeaderRepository.batchUpdateByPrimaryKeySelective(listHeaderChanged);
-
-        return listHeaderChanged;
+    public void deleteData(List<InvoiceApplyLine> invoiceApplyLines) {
+//      Update the head data
+        Set<Long> headerIdSet = invoiceApplyLines.stream().map(InvoiceApplyLine::getApplyHeaderId)
+                .collect(Collectors.toSet());
+        headerIdSet.forEach( x -> {
+            calculateHeaderAmount(x);
+            updateRedis(x);
+        });
     }
 
     public void updateRedis(Long headerId){
@@ -137,7 +81,7 @@ public class InvoiceApplyLineServiceImpl implements InvoiceApplyLineService {
         return headData != null && headData.getDelFlag() != 1;
     }
 
-    public void addToHead(Long headId){
+    public void calculateHeaderAmount(Long headId){
         InvoiceApplyLine newQuery = new InvoiceApplyLine();
         newQuery.setApplyHeaderId(headId);
         List<InvoiceApplyLine> lineList = invoiceApplyLineRepository.select(newQuery);

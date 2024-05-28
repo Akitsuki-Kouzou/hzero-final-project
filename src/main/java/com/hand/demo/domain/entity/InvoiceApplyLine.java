@@ -164,5 +164,11 @@ public class InvoiceApplyLine extends AuditDomain {
     @Transient
     @ExcelColumn(en = "Apply Header Number", order = 4)
     private String applyHeaderNumber;
+
+    public void calculateAmount(){
+        this.setTotalAmount(this.getUnitPrice().multiply(this.getQuantity()));
+        this.setTaxAmount(this.getTotalAmount().multiply(this.getTaxRate()));
+        this.setExcludeTaxAmount(this.getTotalAmount().subtract(this.getTaxAmount()));
+    }
 }
 

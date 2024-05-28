@@ -194,5 +194,20 @@ public class InvoiceApplyHeader extends AuditDomain {
     @Transient
     private List<InvoiceApplyLine> lineList;
 
+    @Transient
+    private List<Long> lineIdList;
+
+    public void initAmount() {
+        if (null == this.applyHeaderId) {
+            this.totalAmount = BigDecimal.ZERO;
+            this.taxAmount = BigDecimal.ZERO;
+            this.excludeTaxAmount = BigDecimal.ZERO;
+        } else {
+            this.totalAmount = null;
+            this.taxAmount = null;
+            this.excludeTaxAmount = null;
+        }
+    }
+
 }
 

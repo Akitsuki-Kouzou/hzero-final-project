@@ -30,5 +30,7 @@ public interface InvoiceApplyHeaderRepository extends BaseRepository<InvoiceAppl
 
     void updateRedis(Long applyHeaderId);
 
-    List<InvoiceApplyHeader> redisMessagePush();
+    void deleteRedis(Long applyHeaderId);
+
+    List<InvoiceApplyHeader> selectStatusFailed();
 }

@@ -1,6 +1,5 @@
 package com.hand.demo.api.controller.v1;
 
-import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -74,11 +73,8 @@ public class InvoiceApplyLineController extends BaseController {
     @DeleteMapping
     public ResponseEntity<InvoiceApplyLine> remove(@RequestBody List<InvoiceApplyLine> invoiceApplyLines) {
         SecurityTokenHelper.validToken(invoiceApplyLines);
-//        Update the value of Header
-        List<InvoiceApplyHeader> redisUpdate =  invoiceApplyLineService.deleteData(invoiceApplyLines);
-//        Delete the value of Lines
         invoiceApplyLineRepository.batchDeleteByPrimaryKey(invoiceApplyLines);
-        redisUpdate.forEach(item -> invoiceApplyLineRepository.updateRedis(item.getApplyHeaderId()));
+        invoiceApplyLineService.deleteData(invoiceApplyLines);
         return Results.success();
     }
 

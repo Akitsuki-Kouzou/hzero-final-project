@@ -1,6 +1,5 @@
 package com.hand.demo.app.service;
 
-import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import com.hand.demo.domain.entity.InvoiceApplyLine;
@@ -31,6 +30,6 @@ public interface InvoiceApplyLineService {
      */
     void saveData(List<InvoiceApplyLine> invoiceApplyLines);
 
-    List<InvoiceApplyHeader> deleteData(List<InvoiceApplyLine> invoiceApplyLines);
+    void deleteData(List<InvoiceApplyLine> invoiceApplyLines);
 }
 

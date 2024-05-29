@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hzero-final-project
+    name: 46319-hzero-final-project
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://172.22.4.113:3306/hand_todo?useUnicode=true&characterEncoding=utf-8&useSSL=false}
     username: ${SPRING_DATASOURCE_USERNAME:todo}

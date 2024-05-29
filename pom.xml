@@ -24,7 +24,39 @@
         </dependency>
 
         <!-- 依赖服务列表 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Export/Import -->
+        <dependency>
+            <groupId>org.hzero.boot</groupId>
+            <artifactId>hzero-boot-import</artifactId>
+            <version>1.10.0.RELEASE</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-export</artifactId>
+        </dependency>
+
+        <!-- Interface -->
+        <dependency>
+            <groupId>org.hzero.boot</groupId>
+            <artifactId>hzero-boot-interface</artifactId>
+        </dependency>
+
+        <!-- Job Handler -->
+        <dependency>
+            <groupId>org.hzero.boot</groupId>
+            <artifactId>hzero-boot-scheduler</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-redis</artifactId>
+        </dependency>
         <!-- 依赖组件列表 -->
 
         <!-- 数据库驱动 -->

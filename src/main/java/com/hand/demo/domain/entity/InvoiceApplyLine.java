@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -19,6 +20,8 @@ import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hzero.export.annotation.ExcelColumn;
+import org.hzero.export.annotation.ExcelSheet;
 
 /**
  * (InvoiceApplyLine)实体类
@@ -34,6 +37,7 @@ import lombok.Setter;
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "46324_invoice_apply_line")
+@ExcelSheet(en = "46324_InvoiceApplyLine")
 public class InvoiceApplyLine extends AuditDomain {
     private static final long serialVersionUID = -60631936854586213L;
 
@@ -68,52 +72,69 @@ public class InvoiceApplyLine extends AuditDomain {
 
     @Id
     @GeneratedValue
+    @ExcelColumn(en = "Apply Line Id", order = 2)
     private Long applyLineId;
 
+    @ExcelColumn(en = "Tenant Id", order = 3)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private Long tenantId;
 
+    @ExcelColumn(en = "Apply Header Id", order = 4)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private Long applyHeaderId;
 
+    @Transient
+    @ExcelColumn(en = "Apply Header Number", order = 5)
+    private String applyHeaderNumber;
+
+    @ExcelColumn(en = "Invoice Name", order = 6)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotBlank
     private String invoiceName;
 
+    @ExcelColumn(en = "Content Name", order = 7)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotBlank
     private String contentName;
 
+    @ExcelColumn(en = "Tax Classification Number", order = 8)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotBlank
     private String taxClassificationNumber;
 
+    @ExcelColumn(en = "Unit Price", order = 9)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal unitPrice;
 
+    @ExcelColumn(en = "Quantity", order = 10)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal quantity;
 
+    @ExcelColumn(en = "Exclude Tax Amount", order = 11)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal excludeTaxAmount;
 
+    @ExcelColumn(en = "Tax Rate", order = 12)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal taxRate;
 
+    @ExcelColumn(en = "Tax Amount", order = 13)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal taxAmount;
 
+    @ExcelColumn(en = "Total Amount", order = 14)
     @ApiModelProperty(value = "${column.comment}", required = true)
     @NotNull
     private BigDecimal totalAmount;
 
+    @ExcelColumn(en = "Remark", order = 15)
     private String remark;
 
     private String attribute1;
@@ -145,7 +166,5 @@ public class InvoiceApplyLine extends AuditDomain {
     private String attribute14;
 
     private String attribute15;
-
-
 }
 

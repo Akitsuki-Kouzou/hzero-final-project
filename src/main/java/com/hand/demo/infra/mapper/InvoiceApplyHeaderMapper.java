@@ -19,5 +19,7 @@ public interface InvoiceApplyHeaderMapper extends BaseMapper<InvoiceApplyHeader>
      * @return 返回值
      */
     List<InvoiceApplyHeader> selectList(InvoiceApplyHeader invoiceApplyHeader);
+    List<InvoiceApplyHeader> fuzzySearch(InvoiceApplyHeader invoiceApplyHeader);
+    List<InvoiceApplyHeader> failedHeaderCollections();
 }
 

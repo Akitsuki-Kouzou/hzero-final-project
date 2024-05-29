@@ -41,8 +41,9 @@
 
     <select id = "selectList" resultType = "com.hand.demo.domain.entity.InvoiceApplyLine">
         select
-        <include refid = "BaseSql"/>
+        <include refid = "BaseSql"/>, 4iah.apply_header_number
         from 46324_invoice_apply_line 4ial
+        left join 46324_invoice_apply_header 4iah on 4ial.apply_header_id = 4iah.apply_header_id
         <where>
             <if test="applyLineId !=null">
                 and 4ial.apply_line_id = #{applyLineId,jdbcType = INTEGER}
@@ -52,6 +53,9 @@
             </if>
             <if test="applyHeaderId !=null">
                 and 4ial.apply_header_id = #{applyHeaderId,jdbcType = INTEGER}
+            </if>
+            <if test="applyHeaderNumber !=null">
+                and 4iah.apply_header_number = #{applyHeaderNumber,javaType = VACHAR}
             </if>
             <if test="invoiceName !=null">
                 and 4ial.invoice_name = #{invoiceName,jdbcType = VARCHAR}
@@ -127,6 +131,26 @@
             </if>
             <if test="attribute15 !=null">
                 and 4ial.ATTRIBUTE15 = #{attribute15,jdbcType = VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="fuzzySearch" parameterType="com.hand.demo.domain.entity.InvoiceApplyLine"
+            resultType="com.hand.demo.domain.entity.InvoiceApplyLine">
+        SELECT *
+        FROM 46319_invoice_apply_line
+        <where>
+            <if test="invoiceName != null and invoiceName != ''">
+                LOWER(invoice_name) LIKE CONCAT('%', LOWER(#{invoiceName}), '%')
+            </if>
+            <if test="contentName != null and contentName != ''">
+                AND LOWER(content_name) LIKE CONCAT('%', LOWER(#{contentName}), '%')
+            </if>
+            <if test="taxClassificationNumber != null and taxClassificationNumber != ''">
+                AND LOWER(tax_classification_number) LIKE CONCAT('%', LOWER(#{taxClassificationNumber}), '%')
+            </if>
+            <if test="remark != null and remark != ''">
+                AND LOWER(remark) LIKE CONCAT('%', LOWER(#{remark}), '%')
             </if>
         </where>
     </select>

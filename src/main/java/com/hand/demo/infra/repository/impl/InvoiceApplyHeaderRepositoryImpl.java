@@ -1,6 +1,7 @@
 package com.hand.demo.infra.repository.impl;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.springframework.stereotype.Component;
 import com.hand.demo.domain.entity.InvoiceApplyHeader;
@@ -22,11 +23,14 @@ public class InvoiceApplyHeaderRepositoryImpl extends BaseRepositoryImpl<Invoice
     private InvoiceApplyHeaderMapper invoiceApplyHeaderMapper;
 
     @Override
+    @ProcessLovValue
     public List<InvoiceApplyHeader> selectList(InvoiceApplyHeader invoiceApplyHeader) {
+//        invoiceApplyHeader.setDelFlag(0);
         return invoiceApplyHeaderMapper.selectList(invoiceApplyHeader);
     }
 
     @Override
+    @ProcessLovValue
     public InvoiceApplyHeader selectByPrimary(Long applyHeaderId) {
         InvoiceApplyHeader invoiceApplyHeader = new InvoiceApplyHeader();
         invoiceApplyHeader.setApplyHeaderId(applyHeaderId);
@@ -37,5 +41,14 @@ public class InvoiceApplyHeaderRepositoryImpl extends BaseRepositoryImpl<Invoice
         return invoiceApplyHeaders.get(0);
     }
 
+    @Override
+    public List<InvoiceApplyHeader> fuzzySearch(InvoiceApplyHeader invoiceApplyHeader) {
+        return invoiceApplyHeaderMapper.fuzzySearch(invoiceApplyHeader);
+    }
+
+    @Override
+    public List<InvoiceApplyHeader> failedHeaderCollections() {
+        return invoiceApplyHeaderMapper.failedHeaderCollections();
+    }
 }
 

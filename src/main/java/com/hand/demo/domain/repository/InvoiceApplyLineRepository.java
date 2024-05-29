@@ -27,4 +27,6 @@ public interface InvoiceApplyLineRepository extends BaseRepository<InvoiceApplyL
      * @return 返回值
      */
     InvoiceApplyLine selectByPrimary(Long applyLineId);
+    List<InvoiceApplyLine> selectByHeaderId(Long applyHeaderId);
+    List<InvoiceApplyLine> fuzzySearch(InvoiceApplyLine invoiceApplyLine);
 }

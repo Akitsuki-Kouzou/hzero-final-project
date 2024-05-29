@@ -3,6 +3,7 @@ package com.hand.demo.app.service;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import com.hand.demo.domain.entity.InvoiceApplyHeader;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -29,6 +30,9 @@ public interface InvoiceApplyHeaderService {
      * @param invoiceApplyHeaders 数据
      */
     void saveData(List<InvoiceApplyHeader> invoiceApplyHeaders);
-
+    List<InvoiceApplyHeader> fuzzySearch(InvoiceApplyHeader invoiceApplyHeader);
+    ResponseEntity<InvoiceApplyHeader> deleteById(Long applyHeaderId);
+    ResponseEntity<InvoiceApplyHeader> getHeaderDetail(Long applyHeaderId);
+    void updateHeaderAmounts(Long applyHeaderId);
 }
 

@@ -6,6 +6,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 /**
  * FeignDemo
  */
-@FeignClient(value = "demo-service", path = "/v1/demos")
+@FeignClient(value = "FINAL.46324.HEADER", path = "/v1/demos")
 public interface DemoFeign {
 }

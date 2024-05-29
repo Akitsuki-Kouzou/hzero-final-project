@@ -27,4 +27,6 @@ public interface InvoiceApplyHeaderRepository extends BaseRepository<InvoiceAppl
      * @return 返回值
      */
     InvoiceApplyHeader selectByPrimary(Long applyHeaderId);
+    List<InvoiceApplyHeader> fuzzySearch(InvoiceApplyHeader invoiceApplyHeader);
+    List<InvoiceApplyHeader> failedHeaderCollections();
 }

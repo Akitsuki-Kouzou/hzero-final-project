@@ -1,5 +1,6 @@
 package com.hand.demo.infra.mapper;
 
+import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import io.choerodon.mybatis.common.BaseMapper;
 import com.hand.demo.domain.entity.InvoiceApplyLine;
 
@@ -19,5 +20,7 @@ public interface InvoiceApplyLineMapper extends BaseMapper<InvoiceApplyLine> {
      * @return 返回值
      */
     List<InvoiceApplyLine> selectList(InvoiceApplyLine invoiceApplyLine);
+    List<InvoiceApplyLine> fuzzySearch(InvoiceApplyLine invoiceApplyLine);
+
 }
 

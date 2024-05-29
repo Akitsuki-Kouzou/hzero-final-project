@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hand.demo.infra.mapper.InvoiceApplyHeaderMapper">
-
-
     <sql id = "BaseSql">
         4iah.apply_header_id,
         4iah.tenant_id,
@@ -47,6 +45,14 @@
         <include refid = "BaseSql"/>
         from 46324_invoice_apply_header 4iah
         <where>
+            <choose>
+                <when test="delFlag != null and delFlag == 1">
+                    del_flag = 1
+                </when>
+                <otherwise>
+                    del_flag = 0
+                </otherwise>
+            </choose>
             <if test="applyHeaderId !=null">
                 and 4iah.apply_header_id = #{applyHeaderId,jdbcType = INTEGER}
             </if>
@@ -89,9 +95,9 @@
             <if test="taxAmount !=null">
                 and 4iah.tax_amount = #{taxAmount,jdbcType = OTHER}
             </if>
-            <if test="delFlag !=null">
-                and 4iah.del_flag = #{delFlag,jdbcType = INTEGER}
-            </if>
+<!--            <if test="delFlag !=null">-->
+<!--                and 4iah.del_flag = #{delFlag,jdbcType = INTEGER}-->
+<!--            </if>-->
             <if test="remark !=null">
                 and 4iah.remark = #{remark,jdbcType = VARCHAR}
             </if>
@@ -140,6 +146,52 @@
             <if test="attribute15 !=null">
                 and 4iah.ATTRIBUTE15 = #{attribute15,jdbcType = VARCHAR}
             </if>
+        </where>
+    </select>
+
+    <select id="fuzzySearch" parameterType="com.hand.demo.domain.entity.InvoiceApplyHeader" resultType="com.hand.demo.domain.entity.InvoiceApplyHeader">
+        SELECT
+        <include refid = "BaseSql"/>
+        FROM 46324_invoice_apply_header 4iah
+        <where>
+            <choose>
+                <when test="delFlag != null and delFlag == 1">
+                    del_flag = 1
+                </when>
+                <otherwise>
+                    del_flag = 0
+                </otherwise>
+            </choose>
+            <if test="applyHeaderNumber != null and applyHeaderNumber != ''">
+                AND LOWER(apply_header_number) LIKE CONCAT('%', LOWER(#{applyHeaderNumber}), '%')
+            </if>
+            <if test="billToPerson != null and billToPerson != ''">
+                AND LOWER(bill_to_person) LIKE CONCAT('%', LOWER(#{billToPerson}), '%')
+            </if>
+            <if test="billToPhone != null and billToPhone != ''">
+                AND LOWER(bill_to_phone) LIKE CONCAT('%', LOWER(#{billToPhone}), '%')
+            </if>
+            <if test="billToAddress != null and billToAddress != ''">
+                AND LOWER(bill_to_address) LIKE CONCAT('%', LOWER(#{billToAddress}), '%')
+            </if>
+            <if test="billToEmail != null and billToEmail != ''">
+                AND LOWER(bill_to_email) LIKE CONCAT('%', LOWER(#{billToEmail}), '%')
+            </if>
+            <if test="remark != null and remark != ''">
+                AND LOWER(remark) LIKE CONCAT('%', LOWER(#{remark}), '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="failedHeaderCollections" resultType="com.hand.demo.domain.entity.InvoiceApplyHeader">
+        SELECT
+        <include refid = "BaseSql"/>
+        from 46324_invoice_apply_header 4iah
+        <where>
+            4iah.del_flag = 0
+            and 4iah.apply_status = 'F'
+            and 4iah.invoice_color = 'R'
+            and 4iah.invoice_type = 'E'
         </where>
     </select>
 </mapper>

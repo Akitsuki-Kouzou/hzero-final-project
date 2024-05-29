@@ -1,5 +1,6 @@
 package com.hand.demo.infra.repository.impl;
 
+import com.hand.demo.domain.entity.InvoiceApplyHeader;
 import org.apache.commons.collections.CollectionUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.springframework.stereotype.Component;
@@ -37,5 +38,20 @@ public class InvoiceApplyLineRepositoryImpl extends BaseRepositoryImpl<InvoiceAp
         return invoiceApplyLines.get(0);
     }
 
+    @Override
+    public List<InvoiceApplyLine> selectByHeaderId(Long applyHeaderId) {
+        InvoiceApplyLine invoiceApplyLine = new InvoiceApplyLine();
+        invoiceApplyLine.setApplyHeaderId(applyHeaderId);
+        List<InvoiceApplyLine> invoiceApplyLines = invoiceApplyLineMapper.selectList(invoiceApplyLine);
+        if (invoiceApplyLines.size() == 0) {
+            return null;
+        }
+        return invoiceApplyLines;
+    }
+
+    @Override
+    public List<InvoiceApplyLine> fuzzySearch(InvoiceApplyLine invoiceApplyLine) {
+        return invoiceApplyLineMapper.fuzzySearch(invoiceApplyLine);
+    }
 }
 
